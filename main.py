@@ -9,10 +9,10 @@ import socket
 import threading
 from model import packets_bodies_process
 
-local_port = 1126
+local_port = 1111
 
-remote_server = '185.146.158.19'
-remote_port = 1126
+remote_server = ''
+remote_port = 1111
 
 can_name_parameters = ['can34:2:']
 
