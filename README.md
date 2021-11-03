@@ -1,29 +1,25 @@
 # protocol-wialon-parameter-replacer-service
-Очень простой многопоточный сервис-ретранслятор протокола wialon ips 1.1 для GPS мониторинга который на лету переносит нужные именованные параметры (can) в аналоговые датчики
 
-Важно! Эта версия скрипта для протокола WialonIPS 1.1 (который без контрольных сумм пакетов)
-http://extapi.wialon.com/hw/cfg/Wialon%20IPS_en.pdf
+Simple multithreaded socket server.
 
-Нужен для подключения трекеров передающих именованные параметры по протоколу WialonIPS (например УМКа) к системам мониторинга не распознающих их в стандартном пакете данных.
+Protocol supported: Wialon IPS 1.1 (http://extapi.wialon.com/hw/cfg/Wialon%20IPS_en.pdf)
 
-Помощь с запуском и доработкой скрипта: shlyagin@gmail.com
+Application: Сonverts data packets “on the fly”. Moving additional parameters value to the “Analog input”, if the current GPS tracking server doesn't recognize additional parameters.
 
-Как работает. Пример передаваемых пакетов:
+![wialon_packet_D_description](https://bitlite.ru/wp-content/uploads/2021/11/wialon-packet-D.png)
 
-<---- server  b'#L#8667950;NA\r\n' 
-- авторизуемся 
-
-server ---->  b'#AL#1\r\n' 
-- ответ сервера
-
-tracker --->  b'#D#021121;121111;5355.09260;N;02732.40990;E;0;0;300;7;NA;0;0;777,888;NA;can32:2:111,can33:2:222,**can34:2:333**\r\n' - 
-- получаем данные от трекера
-
-<---- server  b'#D#021121;121111;5355.09260;N;02732.40990;E;0;0;300;7;NA;0;0;777,888,**333**;NA;can32:2:111,can33:2:222,can34:2:333\r\n'
-- отправляем на сервер измененный пакет, переставили значение can34 в качестве третьего значения аналоговых входов
-
-server ---->  b'#AD#1\r\n'
-- ответ сервера о получении
+For example, additional parameter “fuel:2:45.8” can be retranslated as the first analog input.
 
 ![log screen](https://bitlite.ru/wp-content/uploads/2021/11/protocol-wialon-parameter-replacer-service.jpg)
 
+Log:
+
+<---- server  b'#L#8667950;NA\r\n' 
+server ---->  b'#AL#1\r\n' 
+tracker --->  b'#D#021121;121111;5355.09260;N;02732.40990;E;0;0;300;7;NA;0;0;777,888;NA;can32:2:111,can33:2:222,**can34:2:333**\r\n' - 
+<---- server  b'#D#021121;121111;5355.09260;N;02732.40990;E;0;0;300;7;NA;0;0;777,888,**333**;NA;can32:2:111,can33:2:222,can34:2:333\r\n'
+server ---->  b'#AD#1\r\n'
+
+
+
+description in Russian -->
