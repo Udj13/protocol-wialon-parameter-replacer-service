@@ -8,13 +8,10 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 import socket
 import threading
 from model import packets_bodies_process
+import logging
+import settings
 
-local_port = 1111
 
-remote_server = ''
-remote_port = 1111
-
-can_name_parameters = ['can34:2:']
 
 
 class ThreadedServer(object):
@@ -34,24 +31,24 @@ class ThreadedServer(object):
 
     def listen_to_client(self, client, address):
 
-        print("[+] New thread started: ", address)
+        self.logger.debug(f'[+] New thread started: {address}')
         server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        server_socket.connect((remote_server, remote_port))
+        server_socket.connect((settings.remote_server, settings.remote_port))
         while True:
             try:
                 BUFF_SIZE = 4096  # 4 KiB
                 data = b''
                 while True:
                     part = client.recv(BUFF_SIZE)
-                    print('tracker ---> ', part)
+                    self.logger.debug(f'tracker ---> {part}')
                     data += part
                     if len(part) < BUFF_SIZE:
                         # either 0 or end of data
                         break
 
                 if data:
-                    data = packets_bodies_process(data.decode(), can_name_parameters).encode()
-                    print('<---- server ', data)
+                    data = packets_bodies_process(data.decode(), settings.can_name_parameters).encode()
+                    self.logger.debug(f'<---- server {data}')
                     server_socket.send(data)
                 else:
                     raise socket.error
@@ -59,7 +56,7 @@ class ThreadedServer(object):
                 response = server_socket.recv(1024)
                 if response:
                     client.send(response)
-                    print('server ----> ', response)
+                    self.logger.debug(f'server ----> {response}')
                 else:
                     raise socket.error
 
@@ -70,5 +67,19 @@ class ThreadedServer(object):
 
 
 if __name__ == "__main__":
-    print('Socket listen on port ', local_port)
-    ThreadedServer('', local_port).listen()
+
+    logger = logging.getLogger()
+    logger.setLevel(logging.DEBUG)
+    formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
+    fh = logging.FileHandler(settings.log_file_name)
+    fh.setLevel(logging.DEBUG)
+    fh.setFormatter(formatter)
+    logger.addHandler(fh)
+    ch = logging.StreamHandler()
+    ch.setLevel(logging.DEBUG)
+    ch.setFormatter(formatter)
+    logger.addHandler(ch)
+    logger.debug('log started')
+
+    logger.debug(f'Socket listen on port {settings.local_port}')
+    ThreadedServer('', settings.local_port).listen()
