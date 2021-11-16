@@ -1,7 +1,7 @@
-local_port = 1126
+local_port = 1111
 
-remote_server = '185.146.158.19'
-remote_port = 1126
+remote_server = '555.555.555.555'
+remote_port = 1111
 
 log_file_name = 'wialon_ips_log.txt'
 
