@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 """Copyright 2021 Eugeny Shlyagin (shlyagin@gmail.com)
 
 This program is distributed in the hope that it will be useful,
